@@ -1,45 +1,30 @@
----
-# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-# image will be published to ghcr.io/<user>/<name>
-name: template
-# description will be included in the image's metadata
-description: This is my personal OS image.
+name: system76-bluefin
+description: Custom Bluefin image with System76 hardware scheduling and power management.
+base-image: ghcr.io/ublue-os/bluefin-dx-nvidia
+image-version: latest
 
-# the base image to build on top of (FROM) and the version tag to use
-base-image: ghcr.io/ublue-os/silverblue-main
-image-version: 42 # latest is also supported if you want new updates ASAP
-
-# module configuration, executed in order
-# you can include multiple instances of the same module
 modules:
-  - type: files
-    files:
-      - source: system
-        destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
+  # 1. Add the System76 Fedora COPR repository
+  - type: script
+    snippets:
+      - "curl -Lo /etc/yum.repos.d/szydell-system76.repo https://copr.fedorainfracloud.org/coprs/szydell/system76/repo/fedora-$(rpm -E %fedora)/szydell-system76-fedora-$(rpm -E %fedora).repo"
 
-  - type: dnf
-    repos:
-      copr:
-        - atim/starship
+  # 2. Install the System76 hardware and performance stack
+  - type: rpm-ostree
     install:
-      packages:
-        - micro
-        - starship
-    remove:
-      packages:
-        # example: removing firefox (in favor of the flatpak)
-        # "firefox" is the main package, "firefox-langpacks" is a dependency
-        - firefox
-        - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
+      - system76-power
+      - system76-firmware
+      - firmware-manager
+      - system76-driver
+      - system76-scheduler
 
-  - type: default-flatpaks
-    configurations:
-      - notify: true # Send notification after install/uninstall is finished (true/false)
-        scope: system
-        # If no repo information is specified, Flathub will be used by default
-        install: # system flatpaks we want all users to have and not remove
-          - org.mozilla.firefox
-          - org.gnome.Loupe
-      - scope: user # Also add Flathub user repo, but no user packages
-
-  - type: signing # this sets up the proper policy & signing files for signed images to work fully
+  # 3. Swap out default power management for System76's tools
+  - type: systemd
+    system:
+      masked:
+        - tuned.service
+        - power-profiles-daemon.service
+      enabled:
+        - system76-power.service
+        - system76-firmware-daemon.service
+        - system76-scheduler.service
