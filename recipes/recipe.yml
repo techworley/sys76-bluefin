@@ -20,12 +20,12 @@ modules:
       - system76-scheduler
 
   # 3. Swap out default power management for System76's tools
-  - type: systemd
+- type: systemd
     system:
       masked:
         - tuned.service
         - power-profiles-daemon.service
       enabled:
-        - system76-power.service
+        - com.system76.PowerDaemon.service
         - system76-firmware-daemon.service
-        - system76-scheduler.service
+        - com.system76.Scheduler.service
