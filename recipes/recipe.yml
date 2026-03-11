@@ -4,7 +4,7 @@ base-image: ghcr.io/ublue-os/bluefin-dx-nvidia
 image-version: latest
 
 modules:
-  # 1. Add the System76 Fedora COPR repository
+  # 1. Add the System76 Fedora COPR repositories
   - type: script
     snippets:
       - "curl -Lo /etc/yum.repos.d/szydell-system76.repo https://copr.fedorainfracloud.org/coprs/szydell/system76/repo/fedora-$(rpm -E %fedora)/szydell-system76-fedora-$(rpm -E %fedora).repo"
@@ -20,7 +20,7 @@ modules:
       - system76-scheduler
 
   # 3. Swap out default power management for System76's tools
-- type: systemd
+  - type: systemd
     system:
       masked:
         - tuned.service
