@@ -8,6 +8,7 @@ modules:
   - type: script
     snippets:
       - "curl -Lo /etc/yum.repos.d/szydell-system76.repo https://copr.fedorainfracloud.org/coprs/szydell/system76/repo/fedora-$(rpm -E %fedora)/szydell-system76-fedora-$(rpm -E %fedora).repo"
+      - "curl -Lo /etc/yum.repos.d/kylegospo-system76-scheduler.repo https://copr.fedorainfracloud.org/coprs/kylegospo/system76-scheduler/repo/fedora-$(rpm -E %fedora)/kylegospo-system76-scheduler-fedora-$(rpm -E %fedora).repo"
 
   # 2. Install the System76 hardware and performance stack
   - type: rpm-ostree
